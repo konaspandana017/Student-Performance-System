@@ -186,10 +186,12 @@ def teacher_dashboard(request):
 
     return render(request, 'accounts/teacher_dashboard.html', context)
 
+
 @login_required(login_url='login')
 def student_dashboard(request):
     from analytics_app.models import Mark, Attendance, Subject
-    from django.db.models import Avg, Count, Q
+    from django.db.models import Avg
+    from accounts.suggestions import generate_suggestions
 
     student = request.user
 
@@ -218,11 +220,15 @@ def student_dashboard(request):
     present_days = Attendance.objects.filter(student=student, is_present=True).count()
     attendance_percentage = (present_days / total_attendance * 100) if total_attendance > 0 else 0
 
+    # Generate suggestions
+    suggestions = generate_suggestions(student)
+
     context = {
         'subject_performance': subject_performance,
         'overall_average': round(overall_avg, 2),
         'attendance_percentage': round(attendance_percentage, 2),
         'total_marks': all_marks.count(),
+        'suggestions': suggestions,
     }
 
     return render(request, 'accounts/student_dashboard.html', context)

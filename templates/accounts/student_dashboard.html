@@ -444,46 +444,34 @@
         </div>
     </div>
 
-    <!-- Suggestions -->
-    <div class="suggestions-section">
-        <h3 class="section-title">💡 Personalized Suggestions</h3>
+   <!-- Suggestions -->
+<div class="suggestions-section">
+    <h3 class="section-title">💡 Personalized Suggestions</h3>
 
-        {% if attendance_percentage < 75 %}
-        <div class="suggestion-item">
-            <div class="suggestion-title">⚠️ Improve Your Attendance</div>
-            <div class="suggestion-text">Your attendance is {{ attendance_percentage|floatformat:1 }}%. Attendance below 75% may affect your overall performance. Try to attend all classes regularly.</div>
+    {% if suggestions %}
+        {% for suggestion in suggestions %}
+        <div class="suggestion-item" style="border-left-color:
+            {% if suggestion.type == 'success' %}#9CAF88
+            {% elif suggestion.type == 'warning' %}#C84B31
+            {% elif suggestion.type == 'danger' %}#C84B31
+            {% else %}#C9A876
+            {% endif %};
+            background:
+            {% if suggestion.type == 'success' %}rgba(156, 175, 136, 0.05)
+            {% elif suggestion.type == 'warning' %}rgba(200, 75, 49, 0.05)
+            {% elif suggestion.type == 'danger' %}rgba(200, 75, 49, 0.08)
+            {% else %}rgba(201, 168, 118, 0.05)
+            {% endif %};">
+            <div class="suggestion-title">{{ suggestion.emoji }} {{ suggestion.title }}</div>
+            <div class="suggestion-text">{{ suggestion.message }}</div>
         </div>
-        {% endif %}
-
-        {% if overall_average < 60 %}
-        <div class="suggestion-item">
-            <div class="suggestion-title">📌 Focus on Your Studies</div>
-            <div class="suggestion-text">Your current average is {{ overall_average|floatformat:1 }}%. Consider dedicating more time to your subjects and seeking help from your teachers.</div>
+        {% endfor %}
+    {% else %}
+        <div class="no-data">
+            <p>📊 No suggestions available yet. Add some marks and attendance to get personalized suggestions!</p>
         </div>
-        {% elif overall_average < 75 %}
-        <div class="suggestion-item">
-            <div class="suggestion-title">📌 Aim for Better Grades</div>
-            <div class="suggestion-text">Your average is {{ overall_average|floatformat:1 }}%. With a bit more effort, you can push this higher. Focus on the subjects where you're struggling most.</div>
-        </div>
-        {% else %}
-        <div class="suggestion-item">
-            <div class="suggestion-title">✅ Keep Up the Good Work!</div>
-            <div class="suggestion-text">Your overall performance ({{ overall_average|floatformat:1 }}%) is excellent! Consistency is key to continued success. Keep maintaining this level of performance.</div>
-        </div>
-        {% endif %}
-
-        {% if overall_average >= 80 and attendance_percentage >= 90 %}
-        <div class="suggestion-item">
-            <div class="suggestion-title">🎯 You're on Track!</div>
-            <div class="suggestion-text">Excellent work! Both your grades and attendance are strong. Continue this momentum and you'll achieve great results.</div>
-        </div>
-        {% endif %}
-
-        <div class="suggestion-item">
-            <div class="suggestion-title">🌱 Next Steps</div>
-            <div class="suggestion-text">Review your weak areas, practice regularly, and don't hesitate to ask teachers for clarification. Regular effort compounds to excellent results!</div>
-        </div>
-    </div>
+    {% endif %}
+</div>
 </div>
 
 {% endblock %}
