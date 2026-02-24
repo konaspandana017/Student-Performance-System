@@ -14,27 +14,29 @@ def home_view(request):
 
 def login_view(request):
     if request.method == "POST":
-        username = request.POST['username']
-        password = request.POST['password']
-        role = request.POST['role']
+        username = request.POST.get('username')
+        password = request.POST.get('password')
 
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
             login(request, user)
 
-            # Redirect based on role
-            if role == 'admin':
-                return redirect('admin_dashboard')
-            elif role == 'teacher':
-                return redirect('teacher_dashboard')
-            elif role == 'student':
-                return redirect('student_dashboard')
-            else:
+            # Check if profile exists
+            try:
+                role = user.profile.role
+                if role == 'Admin':
+                    return redirect('admin_dashboard')
+                elif role == 'Teacher':
+                    return redirect('teacher_dashboard')
+                elif role == 'Student':
+                    return redirect('student_dashboard')
+            except:
+                messages.error(request, "Profile not found. Contact admin.")
+                logout(request)
                 return redirect('login')
         else:
-            messages.error(request, "Invalid username or password")
-            return redirect('login')
+            messages.error(request, "❌ Invalid username or password")
 
     return render(request, 'accounts/login.html')
 
