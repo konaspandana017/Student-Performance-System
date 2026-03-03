@@ -1,318 +1,408 @@
 {% extends 'base.html' %}
 
-{% block title %}Student Dashboard - Student Performance System{% endblock %}
-
 {% block content %}
 <style>
-    .dashboard-header {
-        background: linear-gradient(135deg, var(--secondary-bg) 0%, var(--primary-bg) 100%);
-        padding: 2rem 0;
+    .student-dashboard {
+        animation: fadeInUp 0.8s ease-out;
+    }
+
+    .student-header {
         margin-bottom: 2rem;
-        border-bottom: 1px solid var(--border-color);
+        padding: 2rem;
+        background: linear-gradient(135deg, rgba(156, 175, 136, 0.1) 0%, rgba(212, 165, 116, 0.1) 100%);
+        border-radius: 20px;
+        border: 1px solid rgba(156, 175, 136, 0.2);
+        animation: slideDown 0.8s ease-out;
     }
 
-    .dashboard-header h1 {
-        color: var(--text-primary);
-        font-size: 2.5rem;
-        margin-bottom: 0.5rem;
-    }
-
-    .dashboard-header p {
-        color: var(--text-secondary);
-        font-size: 1rem;
-    }
-
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
         gap: 1.5rem;
-        margin-bottom: 2rem;
     }
 
-    .stat-box {
-        background: linear-gradient(135deg, var(--secondary-bg) 0%, rgba(0, 151, 167, 0.05) 100%);
-        border: 1px solid var(--border-color);
-        border-radius: 12px;
-        padding: 1.5rem;
-        text-align: center;
-        transition: all 0.3s ease;
-    }
-
-    .stat-box:hover {
-        transform: translateY(-5px);
-        box-shadow: var(--shadow);
-        border-color: var(--accent-blue);
-    }
-
-    .stat-label {
-        color: var(--text-secondary);
-        font-size: 0.85rem;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
+    .header-info h1 {
+        font-size: 2.2rem;
+        color: #8B6F47;
         margin-bottom: 0.5rem;
-        font-weight: 600;
+        font-weight: 700;
     }
 
-    .stat-value {
-        color: var(--accent-blue);
-        font-size: 2.5rem;
+    .header-info p {
+        color: #5D5047;
+        font-size: 0.95rem;
+    }
+
+    .header-stats {
+        display: flex;
+        gap: 1.5rem;
+        margin-top: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .header-stat {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+    }
+
+    .header-stat-label {
+        color: #5D5047;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .header-stat-value {
+        font-size: 1.5rem;
         font-weight: 700;
+        color: #C84B31;
+    }
+
+    .overall-score {
+        background: white;
+        padding: 2rem;
+        border-radius: 20px;
+        box-shadow: 0 4px 12px rgba(139, 111, 71, 0.1);
+        border: 1px solid rgba(139, 111, 71, 0.1);
+        text-align: center;
+        animation: slideUp 0.8s ease-out 0.1s both;
+    }
+
+    .score-circle {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: conic-gradient(#C84B31 0deg, #C84B31 331deg, #E8DCC8 331deg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        position: relative;
+        box-shadow: 0 8px 20px rgba(200, 75, 49, 0.2);
+    }
+
+    .score-circle::before {
+        content: '';
+        position: absolute;
+        width: 110px;
+        height: 110px;
+        border-radius: 50%;
+        background: white;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1;
+    }
+
+    .score-text {
+        position: relative;
+        z-index: 2;
+        font-size: 2rem;
+        font-weight: 700;
+        color: #C84B31;
+    }
+
+    .score-label {
+        color: #5D5047;
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
     }
 
     .subject-cards {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
         gap: 1.5rem;
-        margin-bottom: 2rem;
+        margin: 2rem 0;
     }
 
     .subject-card {
-        background: var(--secondary-bg);
-        border: 1px solid var(--border-color);
-        border-radius: 12px;
-        padding: 1.5rem;
-        transition: all 0.3s ease;
-        cursor: pointer;
+        background: white;
+        padding: 1.8rem;
+        border-radius: 20px;
+        box-shadow: 0 4px 12px rgba(139, 111, 71, 0.1);
+        border: 1px solid rgba(139, 111, 71, 0.1);
+        transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        position: relative;
+        overflow: hidden;
+        animation: slideUp 0.8s ease-out backwards;
+    }
+
+    .subject-card:nth-child(1) { animation-delay: 0.2s; }
+    .subject-card:nth-child(2) { animation-delay: 0.3s; }
+    .subject-card:nth-child(3) { animation-delay: 0.4s; }
+    .subject-card:nth-child(4) { animation-delay: 0.5s; }
+
+    .subject-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #C84B31, #C9A876);
     }
 
     .subject-card:hover {
-        transform: translateY(-5px);
-        box-shadow: var(--shadow);
-        border-color: var(--accent-blue);
-        background: var(--tertiary-bg);
+        transform: translateY(-8px);
+        box-shadow: 0 12px 30px rgba(139, 111, 71, 0.15);
+        border-color: #C9A876;
     }
 
     .subject-header {
         display: flex;
         justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1rem;
+        align-items: flex-start;
+        margin-bottom: 1.2rem;
     }
 
     .subject-name {
-        color: var(--text-primary);
-        font-weight: 600;
-        font-size: 1.1rem;
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #8B6F47;
     }
 
     .subject-score {
-        color: var(--accent-green);
+        font-size: 1.8rem;
         font-weight: 700;
-        font-size: 1.5rem;
+        color: #C84B31;
+    }
+
+    .subject-info {
+        font-size: 0.85rem;
+        color: #5D5047;
+        margin-bottom: 0.8rem;
     }
 
     .progress-bar {
         width: 100%;
         height: 8px;
-        background: var(--border-color);
-        border-radius: 4px;
+        background: rgba(139, 111, 71, 0.1);
+        border-radius: 10px;
         overflow: hidden;
-        margin-bottom: 0.75rem;
+        margin-bottom: 1rem;
     }
 
     .progress-fill {
         height: 100%;
-        background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
-        border-radius: 4px;
+        background: linear-gradient(90deg, #9CAF88, #C84B31);
+        border-radius: 10px;
+        animation: expandWidth 1.2s ease-out forwards;
     }
 
-    .progress-label {
-        color: var(--text-secondary);
-        font-size: 0.85rem;
+    .achievements-section {
+        background: white;
+        padding: 2rem;
+        border-radius: 20px;
+        box-shadow: 0 4px 12px rgba(139, 111, 71, 0.1);
+        border: 1px solid rgba(139, 111, 71, 0.1);
+        animation: slideUp 0.8s ease-out 0.6s both;
     }
 
     .section-title {
-        color: var(--text-primary);
-        font-size: 1.5rem;
+        font-size: 1.3rem;
+        color: #8B6F47;
+        font-weight: 700;
         margin-bottom: 1.5rem;
-        font-weight: 600;
-        margin-top: 2rem;
-    }
-
-    .card-section {
-        background: var(--secondary-bg);
-        border-radius: 12px;
-        border: 1px solid var(--border-color);
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-    }
-
-    .chart-wrapper {
-        position: relative;
-        height: 400px;
-        margin-bottom: 2rem;
     }
 
     .achievements-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
         gap: 1rem;
     }
 
     .achievement {
         text-align: center;
         padding: 1.5rem;
-        background: var(--tertiary-bg);
-        border-radius: 10px;
-        border: 1px solid var(--border-color);
+        background: linear-gradient(135deg, rgba(156, 175, 136, 0.1) 0%, rgba(200, 75, 49, 0.05) 100%);
+        border-radius: 15px;
+        border: 1px solid rgba(139, 111, 71, 0.1);
         transition: all 0.3s ease;
+        cursor: pointer;
     }
 
     .achievement:hover {
         transform: scale(1.05);
-        background: var(--secondary-bg);
-        color: var(--accent-green);
-        border-color: var(--accent-blue);
+        background: linear-gradient(135deg, rgba(156, 175, 136, 0.2) 0%, rgba(200, 75, 49, 0.1) 100%);
     }
 
     .achievement-icon {
         font-size: 2.5rem;
         margin-bottom: 0.8rem;
+        animation: bounce 2s ease-in-out infinite;
     }
 
     .achievement-name {
-        color: var(--text-primary);
-        font-weight: 600;
+        font-weight: 700;
+        color: #8B6F47;
         font-size: 0.9rem;
+    }
+
+    .suggestions-section {
+        background: white;
+        padding: 2rem;
+        border-radius: 20px;
+        box-shadow: 0 4px 12px rgba(139, 111, 71, 0.1);
+        border: 1px solid rgba(139, 111, 71, 0.1);
+        animation: slideUp 0.8s ease-out 0.7s both;
+        margin-top: 2rem;
     }
 
     .suggestion-item {
         padding: 1.2rem;
-        background: var(--tertiary-bg);
-        border-left: 4px solid var(--accent-blue);
+        background: linear-gradient(135deg, rgba(200, 75, 49, 0.05) 0%, rgba(212, 165, 116, 0.05) 100%);
+        border-left: 4px solid #C84B31;
         border-radius: 10px;
         margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .suggestion-item:hover {
+        transform: translateX(5px);
+        box-shadow: 0 4px 12px rgba(139, 111, 71, 0.1);
     }
 
     .suggestion-title {
         font-weight: 700;
-        color: var(--text-primary);
+        color: #8B6F47;
         margin-bottom: 0.4rem;
     }
 
     .suggestion-text {
-        color: var(--text-secondary);
+        color: #5D5047;
         font-size: 0.9rem;
         line-height: 1.5;
     }
 
-    .empty-state {
+    .no-data {
         text-align: center;
-        padding: 3rem 1rem;
-        color: var(--text-secondary);
+        padding: 2rem;
+        color: #5D5047;
+        font-style: italic;
     }
 
-    .empty-state-icon {
-        font-size: 3rem;
-        margin-bottom: 1rem;
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
-    .container-xl {
-        max-width: 1200px;
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
-    .charts-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 2rem;
+    @keyframes expandWidth {
+        from {
+            width: 0%;
+        }
+        to {
+            width: var(--width);
+        }
     }
 
+    @keyframes bounce {
+        0%, 100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .header-content {
+            flex-direction: column;
+        }
+
+        .student-header h1 {
+            font-size: 1.5rem;
+        }
+
+        .subject-cards {
+            grid-template-columns: 1fr;
+        }
+
+        .achievements-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
 </style>
 
-<div class="dashboard-header">
-    <div class="container-xl">
-        <h1>My Performance Dashboard</h1>
-        <p>Track your academic progress and achievements</p>
-    </div>
-</div>
+<div class="student-dashboard">
+    <!-- Student Header -->
+    <div class="student-header">
+        <div class="header-content">
+            <div class="header-info">
+                <h1>👨‍🎓 Welcome, {{ user.first_name|default:"Student" }}!</h1>
+                <p>Track your academic progress and achievements</p>
+                <div class="header-stats">
+                    <div class="header-stat">
+                        <span class="header-stat-label">Total Marks</span>
+                        <span class="header-stat-value">{{ total_marks }}</span>
+                    </div>
+                    <div class="header-stat">
+                        <span class="header-stat-label">Attendance</span>
+                        <span class="header-stat-value">{{ attendance_percentage|floatformat:1 }}%</span>
+                    </div>
+                    <div class="header-stat">
+                        <span class="header-stat-label">Average Score</span>
+                        <span class="header-stat-value">{{ overall_average|floatformat:1 }}</span>
+                    </div>
+                </div>
+            </div>
 
-<div class="container-xl px-4 pb-5">
-    <!-- Quick Stats -->
-    <div class="stats-grid">
-        <div class="stat-box">
-            <div class="stat-label">Overall Average</div>
-            <div class="stat-value">{{ overall_average }}</div>
-        </div>
-        <div class="stat-box">
-            <div class="stat-label">Attendance</div>
-            <div class="stat-value">{{ attendance_percentage }}%</div>
-        </div>
-        <div class="stat-box">
-            <div class="stat-label">Total Marks</div>
-            <div class="stat-value">{{ total_marks }}</div>
-        </div>
-        <div class="stat-box">
-            <div class="stat-label">Subjects Enrolled</div>
-            <div class="stat-value">{{ subject_performance|length }}</div>
+            <div class="overall-score">
+                <div class="score-circle">
+                    <span class="score-text">{{ overall_average|floatformat:0 }}</span>
+                </div>
+                <div class="score-label">Overall Performance</div>
+            </div>
         </div>
     </div>
 
     <!-- Subject Performance -->
-    <h2 class="section-title">Subject Performance</h2>
-    {% if subject_performance %}
+    <h2 class="section-title">📚 Subject Performance</h2>
     <div class="subject-cards">
-        {% for subject in subject_performance %}
-        <div class="subject-card">
-            <div class="subject-header">
-                <div class="subject-name">{{ subject.name }}</div>
-                <div class="subject-score">{{ subject.average }}/100</div>
+        {% if subject_performance %}
+            {% for subject in subject_performance %}
+            <div class="subject-card">
+                <div class="subject-header">
+                    <div class="subject-name">{{ subject.name }}</div>
+                    <div class="subject-score">{{ subject.average }}/100</div>
+                </div>
+                <div class="subject-info">Your average in this subject</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: {{ subject.percentage }}%"></div>
+                </div>
+                <small style="color: #5D5047;">Performance: {{ subject.percentage|floatformat:1 }}%</small>
             </div>
-            <div class="progress-bar">
-                <div class="progress-fill" style="width: {{ subject.percentage }}%"></div>
+            {% endfor %}
+        {% else %}
+            <div class="no-data">
+                <p>📚 No marks added yet. Please contact your teacher to get started!</p>
             </div>
-            <div class="progress-label">Progress: {{ subject.percentage }}%</div>
-        </div>
-        {% endfor %}
+        {% endif %}
     </div>
-    {% else %}
-    <div class="empty-state">
-        <div class="empty-state-icon">📚</div>
-        <p>No marks recorded yet. Please contact your teacher to get started!</p>
-    </div>
-    {% endif %}
-
-    <!-- Performance Charts -->
-    {% if subject_performance %}
-    <h2 class="section-title">Performance Analysis</h2>
-    <div class="charts-grid">
-        <!-- Subject Comparison Chart -->
-        <div class="card-section">
-            <h3 style="color: var(--text-primary); margin-bottom: 1rem; font-size: 1.2rem;">Subject Comparison</h3>
-            <div class="chart-wrapper">
-                <canvas id="subjectChart"></canvas>
-            </div>
-        </div>
-
-        <!-- Performance Trend Chart -->
-        <div class="card-section">
-            <h3 style="color: var(--text-primary); margin-bottom: 1rem; font-size: 1.2rem;">Performance Trend</h3>
-            <div class="chart-wrapper">
-                <canvas id="trendChart"></canvas>
-            </div>
-        </div>
-
-        <!-- Attendance Chart -->
-        <div class="card-section">
-            <h3 style="color: var(--text-primary); margin-bottom: 1rem; font-size: 1.2rem;">Attendance Status</h3>
-            <div class="chart-wrapper">
-                <canvas id="attendanceChart"></canvas>
-            </div>
-        </div>
-
-        <!-- Grade Distribution -->
-        <div class="card-section">
-            <h3 style="color: var(--text-primary); margin-bottom: 1rem; font-size: 1.2rem;">Grade Distribution</h3>
-            <div class="chart-wrapper">
-                <canvas id="gradeChart"></canvas>
-            </div>
-        </div>
-    </div>
-    {% endif %}
 
     <!-- Achievements -->
-    <h2 class="section-title">Achievements & Badges</h2>
-    <div class="card-section">
+    <div class="achievements-section">
+        <h3 class="section-title">🏆 Achievements & Badges</h3>
         <div class="achievements-grid">
             {% if overall_average >= 80 %}
             <div class="achievement">
@@ -355,294 +445,45 @@
     </div>
 
     <!-- Suggestions -->
-    <h2 class="section-title">Personalized Suggestions</h2>
-    <div class="card-section">
+    <div class="suggestions-section">
+        <h3 class="section-title">💡 Personalized Suggestions</h3>
+
         {% if attendance_percentage < 75 %}
         <div class="suggestion-item">
             <div class="suggestion-title">⚠️ Improve Your Attendance</div>
-            <div class="suggestion-text">Your attendance is {{ attendance_percentage }}%. Regular attendance is crucial for academic success.</div>
+            <div class="suggestion-text">Your attendance is {{ attendance_percentage|floatformat:1 }}%. Attendance below 75% may affect your overall performance. Try to attend all classes regularly.</div>
         </div>
         {% endif %}
 
         {% if overall_average < 60 %}
         <div class="suggestion-item">
             <div class="suggestion-title">📌 Focus on Your Studies</div>
-            <div class="suggestion-text">Your current average is {{ overall_average }}. Consider seeking help from your teachers.</div>
+            <div class="suggestion-text">Your current average is {{ overall_average|floatformat:1 }}%. Consider dedicating more time to your subjects and seeking help from your teachers.</div>
         </div>
         {% elif overall_average < 75 %}
         <div class="suggestion-item">
             <div class="suggestion-title">📌 Aim for Better Grades</div>
-            <div class="suggestion-text">Your average is {{ overall_average }}. With more effort, you can improve significantly.</div>
+            <div class="suggestion-text">Your average is {{ overall_average|floatformat:1 }}%. With a bit more effort, you can push this higher. Focus on the subjects where you're struggling most.</div>
         </div>
         {% else %}
         <div class="suggestion-item">
             <div class="suggestion-title">✅ Keep Up the Good Work!</div>
-            <div class="suggestion-text">Your overall performance ({{ overall_average }}%) is excellent! Continue this momentum.</div>
+            <div class="suggestion-text">Your overall performance ({{ overall_average|floatformat:1 }}%) is excellent! Consistency is key to continued success. Keep maintaining this level of performance.</div>
+        </div>
+        {% endif %}
+
+        {% if overall_average >= 80 and attendance_percentage >= 90 %}
+        <div class="suggestion-item">
+            <div class="suggestion-title">🎯 You're on Track!</div>
+            <div class="suggestion-text">Excellent work! Both your grades and attendance are strong. Continue this momentum and you'll achieve great results.</div>
         </div>
         {% endif %}
 
         <div class="suggestion-item">
             <div class="suggestion-title">🌱 Next Steps</div>
-            <div class="suggestion-text">Review weak areas regularly, practice consistently, and don't hesitate to ask teachers for help. Steady effort leads to excellent results!</div>
+            <div class="suggestion-text">Review your weak areas, practice regularly, and don't hesitate to ask teachers for clarification. Regular effort compounds to excellent results!</div>
         </div>
     </div>
 </div>
-
-<script>
-    // Chart color configuration
-    const chartConfig = {
-        darkTheme: {
-            primary: '#3b82f6',
-            secondary: '#10b981',
-            tertiary: '#f59e0b',
-            background: 'rgba(59, 130, 246, 0.1)',
-            gridColor: '#475569',
-            textColor: '#cbd5e1'
-        },
-        lightTheme: {
-            primary: '#0097a7',
-            secondary: '#00897b',
-            tertiary: '#00838f',
-            background: 'rgba(0, 151, 167, 0.1)',
-            gridColor: '#b2ebf2',
-            textColor: '#004d5c'
-        }
-    };
-
-    function getThemeConfig() {
-        const isDarkTheme = !document.documentElement.classList.contains('light-theme');
-        return isDarkTheme ? chartConfig.darkTheme : chartConfig.lightTheme;
-    }
-
-    function createSubjectChart() {
-        const ctx = document.getElementById('subjectChart');
-        if (!ctx) return;
-        
-        const theme = getThemeConfig();
-        const subjects = {{ subject_performance|safe }};
-        
-        const labels = subjects.map(s => s.name);
-        const data = subjects.map(s => s.average);
-
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Average Marks',
-                    data: data,
-                    backgroundColor: theme.primary,
-                    borderColor: theme.primary,
-                    borderRadius: 8,
-                    borderWidth: 1,
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: true,
-                        labels: {
-                            color: theme.textColor,
-                            font: { size: 12, weight: 'bold' }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 100,
-                        grid: { color: theme.gridColor },
-                        ticks: { color: theme.textColor }
-                    },
-                    x: {
-                        grid: { display: false },
-                        ticks: { color: theme.textColor }
-                    }
-                }
-            }
-        });
-    }
-
-    function createTrendChart() {
-        const ctx = document.getElementById('trendChart');
-        if (!ctx) return;
-        
-        const theme = getThemeConfig();
-        const subjects = {{ subject_performance|safe }};
-        
-        // Simulate performance trend data
-        const trendData = [65, 68, 72, 75, 78, (subjects.length > 0 ? subjects[0].average : 80)];
-        const weeks = ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'];
-
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: weeks,
-                datasets: [{
-                    label: 'Your Performance',
-                    data: trendData,
-                    borderColor: theme.primary,
-                    backgroundColor: theme.background,
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.4,
-                    pointBackgroundColor: theme.primary,
-                    pointBorderColor: theme.textColor,
-                    pointRadius: 6,
-                    pointHoverRadius: 8
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: true,
-                        labels: {
-                            color: theme.textColor,
-                            font: { size: 12, weight: 'bold' }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 100,
-                        grid: { color: theme.gridColor },
-                        ticks: { color: theme.textColor }
-                    },
-                    x: {
-                        grid: { color: theme.gridColor },
-                        ticks: { color: theme.textColor }
-                    }
-                }
-            }
-        });
-    }
-
-    function createAttendanceChart() {
-        const ctx = document.getElementById('attendanceChart');
-        if (!ctx) return;
-        
-        const theme = getThemeConfig();
-        const attendance = {{ attendance_percentage }};
-        const absent = 100 - attendance;
-
-        new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Present', 'Absent'],
-                datasets: [{
-                    data: [attendance, absent],
-                    backgroundColor: [theme.secondary, theme.gridColor],
-                    borderColor: [theme.secondary, theme.gridColor],
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: true,
-                        labels: {
-                            color: theme.textColor,
-                            font: { size: 12, weight: 'bold' }
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    function createGradeChart() {
-        const ctx = document.getElementById('gradeChart');
-        if (!ctx) return;
-        
-        const theme = getThemeConfig();
-        const subjects = {{ subject_performance|safe }};
-        
-        function getGradeCount(grade) {
-            return subjects.filter(s => {
-                const avg = s.average;
-                if (grade === 'A+') return avg >= 90;
-                if (grade === 'A') return avg >= 80 && avg < 90;
-                if (grade === 'B') return avg >= 70 && avg < 80;
-                if (grade === 'C') return avg >= 60 && avg < 70;
-                if (grade === 'D') return avg >= 50 && avg < 60;
-                return avg < 50;
-            }).length;
-        }
-
-        const grades = ['A+', 'A', 'B', 'C', 'D', 'F'];
-        const gradeCounts = grades.map(g => getGradeCount(g));
-
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: grades,
-                datasets: [{
-                    label: 'Subjects by Grade',
-                    data: gradeCounts,
-                    backgroundColor: theme.tertiary,
-                    borderColor: theme.tertiary,
-                    borderRadius: 8,
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                indexAxis: 'y',
-                plugins: {
-                    legend: {
-                        display: true,
-                        labels: {
-                            color: theme.textColor,
-                            font: { size: 12, weight: 'bold' }
-                        }
-                    }
-                },
-                scales: {
-                    x: {
-                        beginAtZero: true,
-                        grid: { color: theme.gridColor },
-                        ticks: { color: theme.textColor }
-                    },
-                    y: {
-                        grid: { display: false },
-                        ticks: { color: theme.textColor }
-                    }
-                }
-            }
-        });
-    }
-
-    // Initialize charts on page load
-    document.addEventListener('DOMContentLoaded', function() {
-        createSubjectChart();
-        createTrendChart();
-        createAttendanceChart();
-        createGradeChart();
-    });
-
-    // Update charts when theme changes
-    const originalInitThemeToggle = window.initThemeToggle;
-    window.initThemeToggle = function() {
-        originalInitThemeToggle.call(window);
-        // Add chart update on theme toggle
-        const themeToggle = document.getElementById('themeToggle');
-        if (themeToggle) {
-            themeToggle.addEventListener('click', function() {
-                setTimeout(() => {
-                    location.reload();
-                }, 300);
-            });
-        }
-    };
-</script>
 
 {% endblock %}
